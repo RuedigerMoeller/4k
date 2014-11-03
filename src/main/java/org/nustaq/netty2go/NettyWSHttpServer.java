@@ -1,6 +1,6 @@
 package org.nustaq.netty2go;
 
-import org.nustaq.webserver.WebSocketHttpServer;
+import org.nustaq.netty2go.webserver.WebSocketHttpServer;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;

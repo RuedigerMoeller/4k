@@ -4,7 +4,7 @@ import io.netty.channel.ChannelHandlerContext;
 import org.nustaq.kontraktor.Actor;
 import org.nustaq.kontraktor.remoting.Coding;
 import org.nustaq.kontraktor.util.Log;
-import org.nustaq.webserver.ClientSession;
+import org.nustaq.netty2go.webserver.ClientSession;
 
 /**
  * Created by ruedi on 28.08.14.

@@ -11,7 +11,7 @@ import org.nustaq.kontraktor.remoting.http.ServeFromCPProcessor;
 import org.nustaq.kontraktor.remoting.http.netty.service.HttpRemotingServer;
 import org.nustaq.kontraktor.remoting.http.rest.RestActorServer;
 import org.nustaq.netty2go.NettyWSHttpServer;
-import org.nustaq.webserver.ClientSession;
+import org.nustaq.netty2go.webserver.ClientSession;
 
 import java.io.File;
 import java.util.concurrent.atomic.AtomicInteger;

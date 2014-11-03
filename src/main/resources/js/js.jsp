@@ -4,7 +4,7 @@
     import de.ruedigermoeller.template.*;
 
 // add imports you need during generation =>
-    import minbin.gen.*;
+    import org.nustaq.generation.gen.*;
     import org.nustaq.serialization.*;
 
 // this header is always required to make it work. Cut & Paste this as template

@@ -1,4 +1,4 @@
-package minbin.gen;
+package org.nustaq.generation.gen;
 
 import com.beust.jcommander.JCommander;
 import com.beust.jcommander.Parameter;

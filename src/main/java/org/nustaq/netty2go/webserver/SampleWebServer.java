@@ -1,4 +1,4 @@
-package org.nustaq.webserver;
+package org.nustaq.netty2go.webserver;
 
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.http.FullHttpRequest;

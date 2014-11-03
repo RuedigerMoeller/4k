@@ -1,4 +1,4 @@
-package org.nustaq.machweb;
+package org.nustaq.fork;
 
 import org.nustaq.kontraktor.Actor;
 import org.nustaq.kontraktor.Future;
@@ -11,7 +11,7 @@ import java.util.Date;
 /**
  * Created by ruedi on 01.11.14.
  */
-public class MachWebSession<SERVER extends MachWeb,SESSION extends MachWebSession> extends Actor<SESSION> implements RemotableActor {
+public class FourKSession<SERVER extends FourK,SESSION extends FourKSession> extends Actor<SESSION> implements RemotableActor {
 
     protected long creationTime = System.currentTimeMillis();
     protected String sessionId;

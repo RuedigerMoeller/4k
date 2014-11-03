@@ -1,4 +1,4 @@
-package org.nustaq.machweb;
+package org.nustaq.fork;
 
 import org.nustaq.kontraktor.*;
 import org.nustaq.kontraktor.annotations.Local;
@@ -8,7 +8,7 @@ import org.nustaq.kontraktor.remoting.SerializerType;
 import org.nustaq.kontraktor.remoting.http.netty.wsocket.ActorWSServer;
 import org.nustaq.kontraktor.remoting.minbingen.MB2JS;
 import org.nustaq.kson.Kson;
-import org.nustaq.machweb.util.ScriptComponentLoader;
+import org.nustaq.fork.util.ScriptComponentLoader;
 
 import java.io.File;
 import java.util.*;
@@ -16,7 +16,7 @@ import java.util.*;
 /**
  * Created by ruedi on 01.11.14.
  */
-public abstract class MachWeb<SERVER extends Actor,SESSION extends MachWebSession> extends Actor<SERVER> {
+public abstract class FourK<SERVER extends Actor,SESSION extends FourKSession> extends Actor<SERVER> {
 
     public static String FILEROOT = "./fileroot";
 
@@ -48,7 +48,7 @@ public abstract class MachWeb<SERVER extends Actor,SESSION extends MachWebSessio
             if (result != null ) {
                 String sessionId = "" + sessionIdCounter++; // FIXME: use strings
                 SESSION newSession = createSessionActor(sessionId, clientScheduler, result);
-                newSession.$initFromServer(sessionId, (MachWeb) self());
+                newSession.$initFromServer(sessionId, (FourK) self());
                 sessions.put(sessionId, newSession);
                 p.receive(sessionId, null);
             } else {
@@ -114,7 +114,7 @@ public abstract class MachWeb<SERVER extends Actor,SESSION extends MachWebSessio
             // install handler to automatically search and bundle jslibs + template snippets
             loader = new ScriptComponentLoader().setResourcePath(conf.componentPath);
 
-            ((MachWeb) self()).$init(scheduler);
+            ((FourK) self()).$init(scheduler);
 
             // start websocket server (default path for ws traffic /websocket)
             ActorWSServer server = ActorWSServer.startAsRestWSServer(

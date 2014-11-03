@@ -9,8 +9,8 @@ import org.nustaq.kontraktor.remoting.http.NioHttpServer;
 import org.nustaq.kontraktor.remoting.http.RequestProcessor;
 import org.nustaq.kontraktor.remoting.http.RequestResponse;
 import org.nustaq.netty2go.NettyWSHttpServer;
-import org.nustaq.webserver.ClientSession;
-import org.nustaq.webserver.WebSocketHttpServer;
+import org.nustaq.netty2go.webserver.ClientSession;
+import org.nustaq.netty2go.webserver.WebSocketHttpServer;
 
 import java.io.File;
 import java.nio.charset.Charset;

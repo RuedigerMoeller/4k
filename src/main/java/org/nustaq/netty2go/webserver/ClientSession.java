@@ -1,4 +1,4 @@
-package org.nustaq.webserver;
+package org.nustaq.netty2go.webserver;
 
 /**
  * Created by ruedi on 25.05.14.
