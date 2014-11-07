@@ -1,4 +1,4 @@
-package org.nustaq.fork;
+package org.nustaq.fourk;
 
 import org.nustaq.kontraktor.*;
 import org.nustaq.kontraktor.annotations.Local;
@@ -8,7 +8,7 @@ import org.nustaq.kontraktor.remoting.SerializerType;
 import org.nustaq.kontraktor.remoting.http.netty.wsocket.ActorWSServer;
 import org.nustaq.kontraktor.remoting.minbingen.MB2JS;
 import org.nustaq.kson.Kson;
-import org.nustaq.fork.util.ScriptComponentLoader;
+import org.nustaq.fourk.util.ScriptComponentLoader;
 
 import java.io.File;
 import java.util.*;
@@ -128,7 +128,6 @@ public abstract class FourK<SERVER extends Actor,SESSION extends FourKSession> e
                     )
             );
             installVirtualFileMappers(server);
-
 
         } catch (Exception e) {
             e.printStackTrace();

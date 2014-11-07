@@ -1,4 +1,4 @@
-package org.nustaq.fork;
+package org.nustaq.fourk;
 
 import org.nustaq.kontraktor.Actor;
 import org.nustaq.kontraktor.Future;
@@ -34,6 +34,7 @@ public class FourKSession<SERVER extends FourK,SESSION extends FourKSession> ext
     @Local
     public void $hasBeenUnpublished() {
         app.$clientTerminated(self()).then(() -> self().$stop());
+        self().$close();
     }
 
 }

@@ -1,5 +1,7 @@
-package org.nustaq.fork;
+package org.nustaq.fourk;
 
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 
 /**
@@ -16,4 +18,6 @@ public class ServerConf {
 
     public List userData;
 
+    public HashMap<String,HashSet<String>> allowedMethods;
+    public HashMap<String,HashSet<String>> forbiddenMethods;
 }

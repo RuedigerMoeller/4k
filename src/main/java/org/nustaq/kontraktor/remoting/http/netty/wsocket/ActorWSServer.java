@@ -79,7 +79,6 @@ public class ActorWSServer extends HttpRemotingServer {
         this( facade, contentRoot,coding,new ElasticScheduler(DEFAULT_MAX_THREADS, DEFAULT_CLIENTQ_SIZE) );
     }
 
-
     @Override
     public void onBinaryMessage(ChannelHandlerContext ctx, byte[] buffer) {
         ActorWSClientSession session = getSession(ctx);
