@@ -6,12 +6,14 @@ import org.nustaq.kontraktor.impl.ElasticScheduler;
 import org.nustaq.kontraktor.remoting.Coding;
 import org.nustaq.kontraktor.remoting.SerializerType;
 import org.nustaq.kontraktor.remoting.http.netty.wsocket.ActorWSServer;
+import org.nustaq.kontraktor.remoting.http.rest.RestActorServer;
 import org.nustaq.kontraktor.remoting.minbingen.MB2JS;
 import org.nustaq.kson.Kson;
 import org.nustaq.fourk.util.ScriptComponentLoader;
 
 import java.io.File;
 import java.util.*;
+import java.util.function.BiFunction;
 
 /**
  * Created by ruedi on 01.11.14.
@@ -116,6 +118,21 @@ public abstract class FourK<SERVER extends Actor,SESSION extends FourKSession> e
 
             ((FourK) self()).$init(scheduler);
 
+            // fixme: slowish
+            BiFunction<Actor,String,Boolean> methodSecurity = (actor, method) -> {
+                if ( conf.allowedMethods != null ) {
+                    HashSet<String> methods = conf.allowedMethods.get(actor.getActor().getClass().getSimpleName());
+                    if ( methods != null )
+                        return methods.contains(method);
+                }
+                if ( conf.forbiddenMethods != null ) {
+                    HashSet<String> methods = conf.forbiddenMethods.get(actor.getActor().getClass().getSimpleName());
+                    if (methods == null)
+                        return ! methods.contains(method);
+                }
+                return true;
+            };
+
             // start websocket server (default path for ws traffic /websocket)
             ActorWSServer server = ActorWSServer.startAsRestWSServer(
                     conf.port,
@@ -125,10 +142,10 @@ public abstract class FourK<SERVER extends Actor,SESSION extends FourKSession> e
                     new Coding(
                         SerializerType.MinBin,
                         fstConf -> shortClassNameMapping.forEach( (k,v) -> fstConf.registerCrossPlatformClassMapping(k,v) )
-                    )
+                    ),
+                    methodSecurity
             );
             installVirtualFileMappers(server);
-
         } catch (Exception e) {
             e.printStackTrace();
             return new Promise<>(null, e);

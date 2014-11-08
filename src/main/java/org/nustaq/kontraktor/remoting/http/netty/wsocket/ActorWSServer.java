@@ -7,6 +7,7 @@ import org.nustaq.kontraktor.Scheduler;
 import org.nustaq.kontraktor.impl.ElasticScheduler;
 import org.nustaq.kontraktor.remoting.Coding;
 import org.nustaq.kontraktor.remoting.SerializerType;
+import org.nustaq.kontraktor.remoting.http.RequestProcessor;
 import org.nustaq.kontraktor.remoting.http.ServeFromCPProcessor;
 import org.nustaq.kontraktor.remoting.http.netty.service.HttpRemotingServer;
 import org.nustaq.kontraktor.remoting.http.rest.RestActorServer;
@@ -15,6 +16,7 @@ import org.nustaq.netty2go.webserver.ClientSession;
 
 import java.io.File;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.BiFunction;
 
 /**
  * implements mechanics of transparent actor remoting via websockets based on the websocket api
@@ -35,14 +37,16 @@ public class ActorWSServer extends HttpRemotingServer {
      * @param actServer
      * @param contentRoot
      * @param clientScheduler
+     * @param methodSecurity
      * @return
      * @throws Exception
      */
-    public static ActorWSServer startAsRestWSServer(int port, Actor actServer, File contentRoot, Scheduler clientScheduler, Coding coding) throws Exception {
+    public static ActorWSServer startAsRestWSServer(int port, Actor actServer, File contentRoot, Scheduler clientScheduler, Coding coding, BiFunction<Actor, String, Boolean> methodSecurity) throws Exception {
         ActorWSServer server = new ActorWSServer( actServer, contentRoot, coding, clientScheduler );
 
         // setup a restactor server under /rest
         RestActorServer restServer = new RestActorServer();
+        restServer.setRemoteCallInterceptor(methodSecurity);
         restServer.publish("rest",actServer);
         restServer.joinServer(server);
         server.$addHttpProcessor(new ServeFromCPProcessor()); // FIXME: order should be file => classpath;
@@ -77,6 +81,10 @@ public class ActorWSServer extends HttpRemotingServer {
 
     public ActorWSServer( Actor facade, File contentRoot, Coding coding) {
         this( facade, contentRoot,coding,new ElasticScheduler(DEFAULT_MAX_THREADS, DEFAULT_CLIENTQ_SIZE) );
+    }
+
+    public <T extends RequestProcessor> T findProcessor( Class<T> proc) {
+        return (T) processors.stream().filter( (pr) -> proc.isAssignableFrom(proc.getClass()) ).findFirst().get();
     }
 
     @Override
