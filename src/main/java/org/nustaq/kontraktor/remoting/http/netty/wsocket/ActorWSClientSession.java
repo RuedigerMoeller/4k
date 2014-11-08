@@ -37,7 +37,7 @@ public class ActorWSClientSession<T extends ActorWSClientSession> extends Actor<
         }
         if ( ! isStopped() ) {
             server.sendWSPingMessage(context);
-            delayed(millis, () -> self().$runPing(millis));
+            delayed(millis, () -> $runPing(millis));
         }
     }
 
