@@ -9,6 +9,7 @@ import java.util.List;
  */
 public class ServerConf {
 
+    public boolean devmode = true;
     public int port = 7777;
     public int clientThreads = 2;
     public int clientQSize = 1000;

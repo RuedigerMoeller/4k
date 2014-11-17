@@ -4,6 +4,7 @@ import org.nustaq.kson.Kson;
 
 import java.io.*;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Created by ruedi on 26.10.14.
@@ -47,7 +48,7 @@ public class ScriptComponentLoader {
             if ( finam.indexOf('.') >= 0 ) { // assume is a file
                 if (loc.exists() && !alreadyFound.contains(finam+"#"+loc.getName())) {
                     res.add(loc);
-                    System.out.println("ressolving "+finam+" to "+loc.getAbsolutePath());
+//                    System.out.println("ressolving "+finam+" to "+loc.getAbsolutePath());
                     alreadyFound.add(finam+"#"+loc.getName());
                     return res; // in case of single file, return immediately
                 }
@@ -76,7 +77,7 @@ public class ScriptComponentLoader {
                         File singleFile = f[j];
                         if ( ! singleFile.isDirectory() && !alreadyFound.contains(finam+"#"+singleFile.getName() )) {
                             res.add(singleFile);
-                            System.out.println("ressolving "+finam+" to "+singleFile.getAbsolutePath());
+//                            System.out.println("ressolving "+finam+" to "+singleFile.getAbsolutePath());
                             alreadyFound.add(finam+"#"+singleFile.getName());
                         }
                     }
@@ -102,7 +103,7 @@ public class ScriptComponentLoader {
      */
     public byte[] mergeScripts( String ... jsFileNames ) {
         // inefficient, however SPA's load once, so expect not too many requests
-        ByteArrayOutputStream bout = new ByteArrayOutputStream(2000);
+        ByteArrayOutputStream bout = new ByteArrayOutputStream(200000);
         HashSet hs = new HashSet();
         HashSet<String> done = new HashSet<>();
         for (int i = 0; i < jsFileNames.length; i++) {
@@ -123,6 +124,56 @@ public class ScriptComponentLoader {
                 }
             });
         }
+        byte[] bytes = bout.toByteArray();
+        return bytes;
+    }
+
+    public File lookupSingleScript( String rawFileName, String ... jsFileNames ) {
+        HashSet hs = new HashSet();
+        HashSet<String> done = new HashSet<>();
+        for (int i = 0; i < jsFileNames.length; i++) {
+            String jsFileName = jsFileNames[i];
+            List<File> files = lookupResource(jsFileName,hs, new HashSet<>());
+            File res = files.stream().filter( f -> {
+                String absolutePath = f.getAbsolutePath();
+                if ( f.getName().endsWith(".js") && ! done.contains(absolutePath) ) {
+                    done.add(absolutePath);
+                    System.out.println("   "+f.getName()+" size:"+f.length());
+                    return f.getName().equals(rawFileName);
+                }
+                return false;
+            }).findFirst().get();
+            if (res!=null)
+                return res;
+        }
+        return null;
+    }
+
+    /**
+     * returns document.write of libs
+     * @param jsFileNames
+     * @return
+     */
+    public byte[] createScriptTags( String ... jsFileNames ) {
+        // inefficient, however SPA's load once, so expect not too many requests
+        ByteArrayOutputStream bout = new ByteArrayOutputStream(2000);
+        PrintStream ps = new PrintStream(bout);
+        HashSet hs = new HashSet();
+        HashSet<String> done = new HashSet<>();
+        for (int i = 0; i < jsFileNames.length; i++) {
+            String jsFileName = jsFileNames[i];
+            List<File> files = lookupResource(jsFileName,hs, new HashSet<>());
+            files.forEach( f -> {
+                String absolutePath = f.getAbsolutePath();
+                if ( f.getName().endsWith(".js") && ! done.contains(absolutePath) ) {
+                    done.add(absolutePath);
+                    System.out.println("   " + f.getName() + " size:" + f.length());
+                    ps.println("document.write(\"<script src='jslookup/"+f.getName()+"'></script>\")");
+                    System.out.println("document.write(\"<script src='jslookup/" + jsFileName + "'></script>\")");
+                }
+            });
+        }
+        ps.flush();
         byte[] bytes = bout.toByteArray();
         return bytes;
     }

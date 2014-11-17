@@ -20,6 +20,7 @@ import java.util.function.BiFunction;
  */
 public abstract class FourK<SERVER extends Actor,SESSION extends FourKSession> extends Actor<SERVER> {
 
+    private static boolean DEVMODE = true;
     public static String FILEROOT = "./fileroot";
 
     protected Map<String, SESSION> sessions;
@@ -162,17 +163,32 @@ public abstract class FourK<SERVER extends Actor,SESSION extends FourKSession> e
                 if ( files.size() > 0 )
                     return files.iterator().next();
             }
+            prefix = FILEROOT + "/jslookup";
+            if (f.getPath().replace(File.separatorChar, '/').startsWith(prefix)) {
+                return loader.lookupSingleScript(f.getPath().substring(prefix.length() + 1), conf.components);
+            }
             return f;
         });
 
-        server.setVirtualfileMapper((f) -> {
-            if (f.getName().equals("libs.js")) {
-                return loader.mergeScripts(conf.components);
-            } else if (f.getName().equals("templates.js")) {
-                return loader.mergeTemplateSnippets(conf.components);
-            }
-            return null;
-        });
+        if (!conf.devmode) {
+            server.setVirtualfileMapper( (f) -> {
+                if (f.getName().equals("libs.js")) {
+                    return loader.mergeScripts(conf.components);
+                } else if (f.getName().equals("templates.js")) {
+                    return loader.mergeTemplateSnippets(conf.components);
+                }
+                return null;
+            });
+        } else {
+            server.setVirtualfileMapper( (f) -> {
+                if (f.getName().equals("libs.js")) {
+                    return loader.createScriptTags(conf.components);
+                } else if (f.getName().equals("templates.js")) {
+                    return loader.mergeTemplateSnippets(conf.components);
+                }
+                return null;
+            });
+        }
     }
 
     protected void generateRemoteStubs(ServerConf appconf) throws Exception {
@@ -184,6 +200,5 @@ public abstract class FourK<SERVER extends Actor,SESSION extends FourKSession> e
         }
         MB2JS.Gen(genBase, "generated.js");
     }
-
 
 }
