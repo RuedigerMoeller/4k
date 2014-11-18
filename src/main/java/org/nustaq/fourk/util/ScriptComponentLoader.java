@@ -55,6 +55,17 @@ public class ScriptComponentLoader {
             } else { // assume dir, add all files in this dir to result if not alreadyFound
                 if ( loc.exists() && loc.isDirectory() ) {
                     File dep = new File(loc, "dep.kson");
+                    // problem: dependency resolution ignores respath for snippet files .. put them in front
+                    File f[] = loc.listFiles();
+                    for (int j = 0; f != null && j < f.length; j++) {
+                        File singleFile = f[j];
+                        if ( ! singleFile.isDirectory() && !alreadyFound.contains(finam+"#"+singleFile.getName()) &&
+                               singleFile.getName().endsWith(".tpl.html")) {
+                            res.add(singleFile);
+//                            System.out.println("ressolving "+finam+" to "+singleFile.getAbsolutePath());
+                            alreadyFound.add(finam+"#"+singleFile.getName());
+                        }
+                    }
                     if ( dep.exists() ) {
                         try {
                             String deps[] = (String[]) new Kson().readObject(dep, String[].class);
@@ -72,7 +83,8 @@ public class ScriptComponentLoader {
                     }
                     if ( alreadyChecked.contains(finam) ) // might have been included by dependencies (cyclic)
                         return res;
-                    File f[] = loc.listFiles();
+
+                    f = loc.listFiles();
                     for (int j = 0; f != null && j < f.length; j++) {
                         File singleFile = f[j];
                         if ( ! singleFile.isDirectory() && !alreadyFound.contains(finam+"#"+singleFile.getName() )) {
