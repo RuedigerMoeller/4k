@@ -50,7 +50,11 @@ public class HttpRemotingServer extends WebSocketHttpServer implements NioHttpSe
                 for (int i = 0; !processed && i < processors.size(); i++) {
                     RequestProcessor processor = processors.get(i);
                     processed = processor.processRequest(kreq, (result, error) -> {
+                        // FIXME: clean up confusing if chain ..
+
                         // quirksmode as I cannot directly write http header with netty (or did not figure out how to do that)
+                        // any header sent by the current processor implementation needs translation to
+                        // netty http headers, else headers won't be sent correctly (me not understand why ..)
                         if (result == RequestResponse.MSG_200) {
                             ctx.write(new DefaultHttpResponse(HTTP_1_0, HttpResponseStatus.OK));
                             return;
@@ -63,10 +67,22 @@ public class HttpRemotingServer extends WebSocketHttpServer implements NioHttpSe
                             ctx.write(new DefaultHttpResponse(HTTP_1_0, HttpResponseStatus.INTERNAL_SERVER_ERROR));
                             return;
                         }
+                        if ( result.getStatusCode() == 302 ) {
+                            DefaultHttpResponse msg = new DefaultHttpResponse(HTTP_1_0, HttpResponseStatus.FOUND);
+                            msg.headers().add("Location", result.getLocation());
+                            ctx.write(msg);
+                            return;
+                        }
+
                         if (error == null || error == RequestProcessor.FINISHED) {
                             try {
                                 if (result != null) {
                                     ctx.write(Unpooled.copiedBuffer(result.toString(), Charset.forName("UTF-8")));
+                                }
+                                if ( error == RequestProcessor.FINISHED ) {
+                                    // close after writing
+                                    ChannelFuture f = ctx.writeAndFlush(Unpooled.copiedBuffer("", Charset.forName("UTF-8")));
+                                    f.addListener((ChannelFuture future) -> future.channel().close());
                                 }
                             } catch (Exception e) {
                                 e.printStackTrace();
