@@ -110,6 +110,7 @@ public class NettyWSHttpServer {
         }
 
         private void handleHttpRequest(final ChannelHandlerContext ctx, FullHttpRequest req) throws Exception {
+            // FIXME: 'maekitalo' missing release (see ReferenceCountUtils.release)
             // Handle a bad request.
             if (!req.getDecoderResult().isSuccess()) {
                 sendHttpResponse(ctx, req, new DefaultFullHttpResponse(HTTP_1_1, BAD_REQUEST));
