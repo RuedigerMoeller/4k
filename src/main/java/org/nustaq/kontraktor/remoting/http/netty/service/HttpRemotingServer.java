@@ -152,7 +152,7 @@ public class HttpRemotingServer extends WebSocketHttpServer implements NioHttpSe
 
 //    public static void main(String[] args) throws Exception {
 //        RestActorServer sv = new RestActorServer().map(RestActorServer.MDesc.class);
-//        sv.publish("rest",Actors.AsActor(RestActorServer.RESTActor.class,65000));
+//        sv.Publish("rest",Actors.AsActor(RestActorServer.RESTActor.class,65000));
 //        sv.startOnServer(9999, new KontraktorNettyServer());
 //    }
 
