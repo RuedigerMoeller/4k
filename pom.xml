@@ -11,8 +11,8 @@
 
     <modelVersion>4.0.0</modelVersion>
     <groupId>de.ruedigermoeller</groupId>
-    <artifactId>spacecraft</artifactId>
-    <version>1.0</version>
+    <artifactId>4k</artifactId>
+    <version>1.0-SNAPSHOT</version>
 
     <description>adaptor to run kontraktor actors as web service via netty http or via websockets</description>
     <url>https://github.com/RuedigerMoeller/SPAcecraft</url>
@@ -51,7 +51,6 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-resources-plugin</artifactId>
-                <version>2.6</version>
                 <configuration>
                     <encoding>UTF-8</encoding>
                 </configuration>
@@ -60,6 +59,12 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-javadoc-plugin</artifactId>
+                <configuration>
+                    <additionalparam>-Xdoclint:none</additionalparam>
+                </configuration>
+                <!--<configuration>-->
+                <!--<failOnError>false</failOnError>-->
+                <!--</configuration>-->
                 <executions>
                     <execution>
                         <id>attach-javadocs</id>
