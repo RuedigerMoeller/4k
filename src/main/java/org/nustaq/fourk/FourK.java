@@ -1,5 +1,6 @@
 package org.nustaq.fourk;
 
+import org.nustaq.fourk.util.CSCompiler;
 import org.nustaq.kontraktor.*;
 import org.nustaq.kontraktor.annotations.Local;
 import org.nustaq.kontraktor.impl.ElasticScheduler;
@@ -11,7 +12,14 @@ import org.nustaq.kontraktor.remoting.minbingen.MB2JS;
 import org.nustaq.kson.Kson;
 import org.nustaq.fourk.util.ScriptComponentLoader;
 
+import javax.script.ScriptException;
 import java.io.File;
+import java.io.IOException;
+import java.nio.charset.Charset;
+import java.nio.file.FileSystem;
+import java.nio.file.FileSystems;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.*;
 import java.util.function.BiFunction;
 
@@ -111,7 +119,7 @@ public abstract class FourK<SERVER extends Actor,SESSION extends FourKSession> e
             generateRemoteStubs(conf);
 
             HashMap<String,String>
-                shortClassNameMapping = (HashMap<String, String>) new Kson().readObject(new File("name-map.kson"),HashMap.class);
+                shortClassNameMapping = (HashMap<String, String>) new Kson().readObject(new File("tmp/name-map.kson"),HashMap.class);
 
             ElasticScheduler scheduler = new ElasticScheduler(conf.clientThreads, conf.clientQSize);
             // install handler to automatically search and bundle jslibs + template snippets
@@ -172,7 +180,18 @@ public abstract class FourK<SERVER extends Actor,SESSION extends FourKSession> e
 
         if (!conf.devmode) {
             server.setVirtualfileMapper( (f) -> {
-                if (f.getName().equals("libs.js")) {
+                // FIXME: implement caching
+                if ( f.getName().endsWith(".coffee") ) {
+                    Path path = FileSystems.getDefault().getPath(f.getParent(), f.getName());
+                    try {
+                        byte[] bytes = Files.readAllBytes(path);
+                        String js = CSCompiler.getInstance().toJs(new String(bytes, Charset.forName("UTF-8")));
+                        return js.getBytes();
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                        return e.getMessage().getBytes();
+                    }
+                } else if (f.getName().equals("libs.js")) {
                     return loader.mergeScripts(conf.components);
                 } else if (f.getName().equals("templates.js")) {
                     return loader.mergeTemplateSnippets(conf.components);
@@ -181,7 +200,17 @@ public abstract class FourK<SERVER extends Actor,SESSION extends FourKSession> e
             });
         } else {
             server.setVirtualfileMapper( (f) -> {
-                if (f.getName().equals("libs.js")) {
+                if ( f.getName().endsWith(".coffee") ) {
+                    Path path = FileSystems.getDefault().getPath(f.getParent(), f.getName());
+                    try {
+                        byte[] bytes = Files.readAllBytes(path);
+                        String js = CSCompiler.getInstance().toJs(new String(bytes, Charset.forName("UTF-8")));
+                        return js.getBytes();
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                        return e.getMessage().getBytes();
+                    }
+                } else if (f.getName().equals("libs.js")) {
                     return loader.createScriptTags(conf.components);
                 } else if (f.getName().equals("templates.js")) {
                     return loader.mergeTemplateSnippets(conf.components);
@@ -198,7 +227,7 @@ public abstract class FourK<SERVER extends Actor,SESSION extends FourKSession> e
                 genBase+=","+appconf.scan4Remote[i];
             }
         }
-        MB2JS.Gen(genBase, "generated.js");
+        MB2JS.Gen(genBase, "tmp/generated.js");
     }
 
 }

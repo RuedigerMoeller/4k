@@ -2,6 +2,7 @@ package org.nustaq.fourk.util;
 
 import org.nustaq.kson.Kson;
 
+import javax.script.ScriptException;
 import java.io.*;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -123,6 +124,26 @@ public class ScriptComponentLoader {
             List<File> files = lookupResource(jsFileName,hs, new HashSet<>());
             files.forEach( f -> {
                 String absolutePath = f.getAbsolutePath();
+                if ( f.getName().endsWith(".coffee") && ! done.contains(absolutePath) ) {
+                    done.add(absolutePath);
+                    System.out.println("   "+f.getName()+" size:"+f.length());
+                    File jsName = new File( f.getParent(), f.getName().substring(0,f.getName().length()-".coffee".length())+".jsx");
+                    try {
+                        CSCompiler.getInstance().toJs(f,jsName);
+                    } catch (ScriptException e) {
+                        e.printStackTrace();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                    f = jsName;
+                    byte[] bytes = new byte[(int) f.length()];
+                    try (FileInputStream fileInputStream = new FileInputStream(f)) {
+                        fileInputStream.read(bytes);
+                        bout.write(bytes);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                } else
                 if ( f.getName().endsWith(".js") && ! done.contains(absolutePath) ) {
                     done.add(absolutePath);
                     System.out.println("   "+f.getName()+" size:"+f.length());
@@ -148,7 +169,7 @@ public class ScriptComponentLoader {
             List<File> files = lookupResource(jsFileName,hs, new HashSet<>());
             File res = files.stream().filter( f -> {
                 String absolutePath = f.getAbsolutePath();
-                if ( f.getName().endsWith(".js") && ! done.contains(absolutePath) ) {
+                if ( (f.getName().endsWith(".js") || f.getName().endsWith(".jsx") ) && ! done.contains(absolutePath) ) {
                     done.add(absolutePath);
                     System.out.println("   "+f.getName()+" size:"+f.length());
                     return f.getName().equals(rawFileName);
@@ -168,7 +189,7 @@ public class ScriptComponentLoader {
      */
     public byte[] createScriptTags( String ... jsFileNames ) {
         // inefficient, however SPA's load once, so expect not too many requests
-        ByteArrayOutputStream bout = new ByteArrayOutputStream(2000);
+        ByteArrayOutputStream bout = new ByteArrayOutputStream(200000);
         PrintStream ps = new PrintStream(bout);
         HashSet hs = new HashSet();
         HashSet<String> done = new HashSet<>();
@@ -177,7 +198,20 @@ public class ScriptComponentLoader {
             List<File> files = lookupResource(jsFileName,hs, new HashSet<>());
             files.forEach( f -> {
                 String absolutePath = f.getAbsolutePath();
-                if ( f.getName().endsWith(".js") && ! done.contains(absolutePath) ) {
+                if ( f.getName().endsWith(".coffee") && ! done.contains(absolutePath) ) {
+                    done.add(absolutePath);
+                    System.out.println("   " + f.getName() + " size:" + f.length());
+                    File jsName = new File( f.getParent(), f.getName().substring(0,f.getName().length()-".coffee".length())+".jsx");
+                    try {
+                        CSCompiler.getInstance().toJs(f,jsName);
+                    } catch (ScriptException e) {
+                        e.printStackTrace();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                    ps.println("document.write(\"<script src='jslookup/"+jsName.getName()+"'></script>\")");
+                    System.out.println("document.write(\"<script src='jslookup/" + jsName.getName() + "'></script>\")");
+                } else if ( f.getName().endsWith(".js") && ! done.contains(absolutePath) ) {
                     done.add(absolutePath);
                     System.out.println("   " + f.getName() + " size:" + f.length());
                     ps.println("document.write(\"<script src='jslookup/"+f.getName()+"'></script>\")");

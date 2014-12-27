@@ -31,7 +31,7 @@ public class MBGen extends AbstractGen {
             File f = new File(outFile);
             if ( !f.isDirectory() )
                 f = f.getParentFile();
-            f = new File(f,"name-map.kson");
+            f = new File(f,"tmp/name-map.kson");
             PrintStream pout = new PrintStream( new FileOutputStream(f) );
             pout.println("{");
             clazzSet.stream().forEach(clzStr -> {
