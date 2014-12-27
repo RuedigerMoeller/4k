@@ -127,6 +127,8 @@ public abstract class FourK<SERVER extends Actor,SESSION extends FourKSession> e
 
             ((FourK) self()).$init(scheduler);
 
+            // fixme: make session actors throw exception if full
+
             // fixme: slowish
             BiFunction<Actor,String,Boolean> methodSecurity = (actor, method) -> {
                 if ( conf.allowedMethods != null ) {
