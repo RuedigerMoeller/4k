@@ -155,6 +155,8 @@ public class NettyWSHttpServer {
                 return;
             }
             if (frame instanceof BinaryWebSocketFrame) {
+//                BinaryWebSocketFrame bf = (BinaryWebSocketFrame) frame;
+//                frame.isFinalFragment();
                 ByteBuf rawMessage = frame.content(); // fixme: add bytebuf based handlers as well to avoid alloc+copy
                 int size = rawMessage.readableBytes();
                 byte[] buffer = new byte[size];
@@ -166,6 +168,7 @@ public class NettyWSHttpServer {
                 httpReceiver.onTextMessage(ctx, ((TextWebSocketFrame) frame).text());
                 return;
             }
+            // Fixme: ContinuationWebSocketFrame needs to be handled as well (BinaryWebSocketFrame has flag)
             throw new UnsupportedOperationException(String.format("%s frame types not supported", frame.getClass()
                     .getName()));
         }

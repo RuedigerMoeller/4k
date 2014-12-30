@@ -1,0 +1,13 @@
+<component name="libraryTable">
+  <library name="Maven: de.ruedigermoeller:kontraktor:2.00">
+    <CLASSES>
+      <root url="jar://$MAVEN_REPOSITORY$/de/ruedigermoeller/kontraktor/2.00/kontraktor-2.00.jar!/" />
+    </CLASSES>
+    <JAVADOC>
+      <root url="jar://$MAVEN_REPOSITORY$/de/ruedigermoeller/kontraktor/2.00/kontraktor-2.00-javadoc.jar!/" />
+    </JAVADOC>
+    <SOURCES>
+      <root url="jar://$MAVEN_REPOSITORY$/de/ruedigermoeller/kontraktor/2.00/kontraktor-2.00-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>
