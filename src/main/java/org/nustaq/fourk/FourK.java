@@ -116,6 +116,7 @@ public abstract class FourK<SERVER extends Actor,SESSION extends FourKSession> e
             // pacth conf from args
             conf = (ServerConf) new Kson().readObject(new File("conf.kson"), ServerConf.class.getName());
             parseArgs(arg,conf);
+            new File("./tmp").mkdir();
             generateRemoteStubs(conf);
 
             HashMap<String,String>

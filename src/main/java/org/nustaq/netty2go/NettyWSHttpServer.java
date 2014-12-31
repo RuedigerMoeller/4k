@@ -155,8 +155,9 @@ public class NettyWSHttpServer {
                 return;
             }
             if (frame instanceof BinaryWebSocketFrame) {
-//                BinaryWebSocketFrame bf = (BinaryWebSocketFrame) frame;
-//                frame.isFinalFragment();
+                BinaryWebSocketFrame bf = (BinaryWebSocketFrame) frame;
+                if ( ! frame.isFinalFragment() )
+                    System.out.println("nonfinal binary frame ----------------------------------------------------------------");
                 ByteBuf rawMessage = frame.content(); // fixme: add bytebuf based handlers as well to avoid alloc+copy
                 int size = rawMessage.readableBytes();
                 byte[] buffer = new byte[size];
