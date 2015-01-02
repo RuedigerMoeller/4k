@@ -2,6 +2,8 @@ package org.nustaq.kontraktor.remoting.http.netty.wsocket;
 
 import org.nustaq.kontraktor.remoting.ObjectSocket;
 import org.nustaq.serialization.FSTConfiguration;
+import org.nustaq.serialization.FSTObjectInput;
+import org.nustaq.serialization.coders.FSTMinBinDecoder;
 import org.nustaq.serialization.minbin.MBPrinter;
 import org.nustaq.serialization.minbin.MinBin;
 
@@ -37,7 +39,17 @@ public abstract class WSAbstractObjectSocket implements ObjectSocket {
         final byte[] tmp = nextRead;
         nextRead = null;
         try {
-            return conf.asObject(tmp);
+            final FSTObjectInput objectInput = conf.getObjectInput(tmp);
+            final Object o = objectInput.readObject();
+            // fixme debug code
+            if (objectInput.getCodec() instanceof FSTMinBinDecoder) {
+                FSTMinBinDecoder dec = (FSTMinBinDecoder) objectInput.getCodec();
+                if (dec.getInputPos() != tmp.length) {
+                    System.out.println("----- probably lost object --------- " + dec.getInputPos() + "," + tmp.length);
+                    System.out.println(objectInput.readObject());
+                }
+            }
+            return o;
         } catch (Exception e) {
             if ( conf.isCrossPlatform() ) {
                 System.out.println("error reading:");

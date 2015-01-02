@@ -12,6 +12,7 @@ import io.netty.handler.codec.http.*;
 import io.netty.handler.codec.http.websocketx.*;
 import io.netty.util.CharsetUtil;
 
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Logger;
 
 import static io.netty.handler.codec.http.HttpHeaders.Names.*;
@@ -139,6 +140,7 @@ public class NettyWSHttpServer {
             }
         }
 
+        ConcurrentHashMap<ChannelHandlerContext,byte[]> fragemntedBufs = new ConcurrentHashMap<>();
         private void handleWebSocketFrame(ChannelHandlerContext ctx, WebSocketFrame frame) {
             // Check for closing frame
             if (frame instanceof CloseWebSocketFrame) {
@@ -154,15 +156,33 @@ public class NettyWSHttpServer {
                 httpReceiver.onPong(ctx);
                 return;
             }
-            if (frame instanceof BinaryWebSocketFrame) {
-                BinaryWebSocketFrame bf = (BinaryWebSocketFrame) frame;
-                if ( ! frame.isFinalFragment() )
-                    System.out.println("nonfinal binary frame ----------------------------------------------------------------");
+            if (frame instanceof BinaryWebSocketFrame || frame instanceof ContinuationWebSocketFrame) {
                 ByteBuf rawMessage = frame.content(); // fixme: add bytebuf based handlers as well to avoid alloc+copy
                 int size = rawMessage.readableBytes();
                 byte[] buffer = new byte[size];
                 rawMessage.readBytes(buffer);
-                httpReceiver.onBinaryMessage(ctx, buffer);
+                if ( ! frame.isFinalFragment() ) {
+                    System.out.println("nonfinal binary frame ----------------------------------------------------------------");
+                    byte[] bytes = fragemntedBufs.get(ctx);
+                    if (bytes!=null) {
+                        byte combined[] = new byte[bytes.length+buffer.length];
+                        System.arraycopy(bytes,0,combined,0,bytes.length);
+                        System.arraycopy(buffer,0,combined,bytes.length,buffer.length);
+                        fragemntedBufs.put(ctx,combined);
+                    } else
+                        fragemntedBufs.put(ctx,buffer);
+                } else {
+                    byte[] bytes = fragemntedBufs.get(ctx);
+                    if ( bytes != null ) {
+                        byte combined[] = new byte[bytes.length+buffer.length];
+                        System.arraycopy(bytes,0,combined,0,bytes.length);
+                        System.arraycopy(buffer,0,combined,bytes.length,buffer.length);
+                        fragemntedBufs.remove(ctx);
+                        System.out.println("continued binary frame finished ----------------------------------------------------------------");
+                        httpReceiver.onBinaryMessage(ctx, combined);
+                    } else
+                        httpReceiver.onBinaryMessage(ctx, buffer);
+                }
                 return;
             }
             if (frame instanceof TextWebSocketFrame) {
