@@ -23,6 +23,7 @@ import static io.netty.handler.codec.http.HttpVersion.*;
 
 public class NettyWSHttpServer {
 
+    public static int MAX_FRAME_LENGTH = 256000;
     public static int MAX_REQ_CONTENT_LENGTH = 1024*1024;
     public static Logger logger = Logger.getLogger(WebSocketServerHandler.class.getName());
     public static String WEBSOCKET_PATH = "/websocket";
@@ -125,7 +126,7 @@ public class NettyWSHttpServer {
 
             // Handshake
             WebSocketServerHandshakerFactory wsFactory = new WebSocketServerHandshakerFactory(
-                    getWebSocketLocation(req), null, false);
+                    getWebSocketLocation(req), null, false, MAX_FRAME_LENGTH);
             handshaker = wsFactory.newHandshaker(req);
             if (handshaker == null) {
                 WebSocketServerHandshakerFactory.sendUnsupportedVersionResponse(ctx.channel());
