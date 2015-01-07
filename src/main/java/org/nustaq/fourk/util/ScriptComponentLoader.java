@@ -61,7 +61,8 @@ public class ScriptComponentLoader {
                     for (int j = 0; f != null && j < f.length; j++) {
                         File singleFile = f[j];
                         if ( ! singleFile.isDirectory() && !alreadyFound.contains(finam+"#"+singleFile.getName()) &&
-                               singleFile.getName().endsWith(".tpl.html")) {
+                            singleFile.getName().endsWith(".tpl.html"))
+                        {
                             res.add(singleFile);
 //                            System.out.println("ressolving "+finam+" to "+singleFile.getAbsolutePath());
                             alreadyFound.add(finam+"#"+singleFile.getName());
@@ -69,7 +70,7 @@ public class ScriptComponentLoader {
                     }
                     if ( dep.exists() ) {
                         try {
-                            String deps[] = (String[]) new Kson().readObject(dep, String[].class);
+                            String deps[] = ((FourKModule) new Kson().map(FourKModule.class).readObject(dep, FourKModule.class)).depends;
                             for (int j = 0; j < deps.length; j++) {
                                 String lib = deps[j];
                                 if ( ! alreadyChecked.contains(lib) ) {
