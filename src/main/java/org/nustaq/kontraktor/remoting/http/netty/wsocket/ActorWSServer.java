@@ -130,7 +130,7 @@ public class ActorWSServer extends HttpRemotingServer {
     public void onTextMessage(ChannelHandlerContext ctx, String text) {
         ActorWSClientSession session = getSession(ctx);
         if ( session == null ) {
-            logger.warning("onTextMessage without session");
+            logger.warning("onTextMessage without session:"+text);
         } else {
             session.$onTextMessage(text);
         }
