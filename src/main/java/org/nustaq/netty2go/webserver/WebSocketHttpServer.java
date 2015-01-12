@@ -184,27 +184,44 @@ public class WebSocketHttpServer {
                     content = Unpooled.wrappedBuffer(b);
                     res = new DefaultFullHttpResponse(HTTP_1_1, OK, content);
                 }
-                String accept = req.headers().get("Accept");
-                if ( accept.indexOf("text/html") >= 0 )
+                String uri = req.getUri().toLowerCase();
+                if ( uri.endsWith(".html") )
                     res.headers().set(CONTENT_TYPE, "text/html; charset=UTF-8");
-                else {
-                    String[] split = accept.split(";");
-                    boolean exit = false;
-                    for (int i = 0; i < split.length; i++) {
-                        String s = split[i];
-                        String ss[] = s.split(",");
-                        for (int j = 0; j < ss.length; j++) {
-                            String s1 = ss[j];
-                            if ( s1.indexOf('*') < 0 ) {
-                                res.headers().set(CONTENT_TYPE, s1+"; charset=UTF-8");
-                                exit = true;
-                                break;
-                            }
-                        }
-                        if ( exit )
-                            break;
-                    }
-                }
+                else if ( uri.endsWith(".js") )
+                    res.headers().set(CONTENT_TYPE, "application/x-javascript; charset=UTF-8");
+                else if ( uri.endsWith(".gif") )
+                    res.headers().set(CONTENT_TYPE, "image/gif");
+                else if ( uri.endsWith(".jpg") )
+                    res.headers().set(CONTENT_TYPE, "image/jpeg");
+                else if ( uri.endsWith(".jpeg") )
+                    res.headers().set(CONTENT_TYPE, "image/jpeg");
+                else if ( uri.endsWith(".png") )
+                    res.headers().set(CONTENT_TYPE, "image/png");
+                else if ( uri.endsWith(".css") )
+                    res.headers().set(CONTENT_TYPE, "text/css; charset=UTF-8");
+
+
+//                String accept = req.headers().get("Accept");
+//                if ( accept.indexOf("text/html") >= 0 )
+//                    res.headers().set(CONTENT_TYPE, "text/html; charset=UTF-8");
+//                else {
+//                    String[] split = accept.split(";");
+//                    boolean exit = false;
+//                    for (int i = 0; i < split.length; i++) {
+//                        String s = split[i];
+//                        String ss[] = s.split(",");
+//                        for (int j = 0; j < ss.length; j++) {
+//                            String s1 = ss[j];
+//                            if ( s1.indexOf('*') < 0 ) {
+//                                res.headers().set(CONTENT_TYPE, s1+"; charset=UTF-8");
+//                                exit = true;
+//                                break;
+//                            }
+//                        }
+//                        if ( exit )
+//                            break;
+//                    }
+//                }
                 setContentLength(res, content.readableBytes());
                 sender.sendHttpResponse(ctx, req, res);
                 return;
