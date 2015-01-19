@@ -55,7 +55,7 @@ public class HttpRemotingServer extends WebSocketHttpServer implements NioHttpSe
                         // quirksmode as I cannot directly write http header with netty (or did not figure out how to do that)
                         // any header sent by the current processor implementation needs translation to
                         // netty http headers, else headers won't be sent correctly (me not understand why ..)
-                        if (result == RequestResponse.MSG_200) {
+                        if (result == RequestResponse.MSG_200 ) {
                             ctx.write(new DefaultHttpResponse(HTTP_1_0, HttpResponseStatus.OK));
                             return;
                         }
@@ -67,7 +67,7 @@ public class HttpRemotingServer extends WebSocketHttpServer implements NioHttpSe
                             ctx.write(new DefaultHttpResponse(HTTP_1_0, HttpResponseStatus.INTERNAL_SERVER_ERROR));
                             return;
                         }
-                        if ( result.getStatusCode() == 302 ) {
+                        if ( result != null && result.getStatusCode() == 302 ) {
                             DefaultHttpResponse msg = new DefaultHttpResponse(HTTP_1_0, HttpResponseStatus.FOUND);
                             msg.headers().add("Location", result.getLocation());
                             ctx.write(msg);

@@ -1,5 +1,6 @@
 package org.nustaq.fourk.util;
 
+import org.nustaq.fourk.FourK;
 import org.nustaq.kson.Kson;
 
 import javax.script.ScriptException;
@@ -74,7 +75,8 @@ public class ScriptComponentLoader {
                             for (int j = 0; j < deps.length; j++) {
                                 String lib = deps[j];
                                 if ( ! alreadyChecked.contains(lib) ) {
-                                    System.out.println("=> lib dependency "+lib+" of "+finam);
+                                    if (FourK.DevMode)
+                                        System.out.println("=> lib dependency "+lib+" of "+finam);
                                     res.addAll(lookupResource(lib,alreadyFound,alreadyChecked));
                                     alreadyChecked.add(lib);
                                 }
@@ -127,7 +129,8 @@ public class ScriptComponentLoader {
                 String absolutePath = f.getAbsolutePath();
                 if ( f.getName().endsWith(".coffee") && ! done.contains(absolutePath) ) {
                     done.add(absolutePath);
-                    System.out.println("   "+f.getName()+" size:"+f.length());
+                    if (FourK.DevMode)
+                        System.out.println("   " + f.getName() + " size:" + f.length());
                     File jsName = new File( f.getParent(), f.getName().substring(0,f.getName().length()-".coffee".length())+".jsx");
                     try {
                         CSCompiler.getInstance().toJs(f,jsName);
@@ -147,7 +150,8 @@ public class ScriptComponentLoader {
                 } else
                 if ( f.getName().endsWith(".js") && ! done.contains(absolutePath) ) {
                     done.add(absolutePath);
-                    System.out.println("   "+f.getName()+" size:"+f.length());
+                    if (FourK.DevMode)
+                        System.out.println("   "+f.getName()+" size:"+f.length());
                     byte[] bytes = new byte[(int) f.length()];
                     try (FileInputStream fileInputStream = new FileInputStream(f)) {
                         fileInputStream.read(bytes);
@@ -172,7 +176,8 @@ public class ScriptComponentLoader {
                 String absolutePath = f.getAbsolutePath();
                 if ( (f.getName().endsWith(".js") || f.getName().endsWith(".jsx") ) && ! done.contains(absolutePath) ) {
                     done.add(absolutePath);
-                    System.out.println("   "+f.getName()+" size:"+f.length());
+                    if (FourK.DevMode)
+                        System.out.println("   "+f.getName()+" size:"+f.length());
                     return f.getName().equals(rawFileName);
                 }
                 return false;
@@ -201,7 +206,8 @@ public class ScriptComponentLoader {
                 String absolutePath = f.getAbsolutePath();
                 if ( f.getName().endsWith(".coffee") && ! done.contains(absolutePath) ) {
                     done.add(absolutePath);
-                    System.out.println("   " + f.getName() + " size:" + f.length());
+                    if (FourK.DevMode)
+                        System.out.println("   " + f.getName() + " size:" + f.length());
                     File jsName = new File( f.getParent(), f.getName().substring(0,f.getName().length()-".coffee".length())+".jsx");
                     try {
                         CSCompiler.getInstance().toJs(f,jsName);
@@ -211,12 +217,15 @@ public class ScriptComponentLoader {
                         e.printStackTrace();
                     }
                     ps.println("document.write(\"<script src='jslookup/"+jsName.getName()+"'></script>\")");
-                    System.out.println("document.write(\"<script src='jslookup/" + jsName.getName() + "'></script>\")");
+                    if (FourK.DevMode)
+                        System.out.println("document.write(\"<script src='jslookup/" + jsName.getName() + "'></script>\")");
                 } else if ( f.getName().endsWith(".js") && ! done.contains(absolutePath) ) {
                     done.add(absolutePath);
-                    System.out.println("   " + f.getName() + " size:" + f.length());
+                    if (FourK.DevMode)
+                        System.out.println("   " + f.getName() + " size:" + f.length());
                     ps.println("document.write(\"<script src='jslookup/"+f.getName()+"'></script>\")");
-                    System.out.println("document.write(\"<script src='jslookup/" + jsFileName + "'></script>\")");
+                    if (FourK.DevMode)
+                        System.out.println("document.write(\"<script src='jslookup/" + jsFileName + "'></script>\")");
                 }
             });
         }

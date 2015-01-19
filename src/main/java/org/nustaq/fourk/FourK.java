@@ -4,6 +4,7 @@ import org.nustaq.fourk.util.CSCompiler;
 import org.nustaq.kontraktor.*;
 import org.nustaq.kontraktor.annotations.Local;
 import org.nustaq.kontraktor.impl.ElasticScheduler;
+import org.nustaq.kontraktor.monitoring.Monitorable;
 import org.nustaq.kontraktor.remoting.Coding;
 import org.nustaq.kontraktor.remoting.SerializerType;
 import org.nustaq.kontraktor.remoting.http.netty.wsocket.ActorWSServer;
@@ -28,7 +29,8 @@ import java.util.function.BiFunction;
  */
 public abstract class FourK<SERVER extends Actor,SESSION extends FourKSession> extends Actor<SERVER> {
 
-    private static boolean DEVMODE = true;
+    public static boolean DevMode = true; //
+
     public static String FILEROOT = "./fileroot";
 
     protected Map<String, SESSION> sessions;
@@ -83,6 +85,13 @@ public abstract class FourK<SERVER extends Actor,SESSION extends FourKSession> e
         return p;
     }
 
+    /**
+     * return null if not a user, else return a user-object which is then passed to
+     * session object
+     * @param user
+     * @param pwd
+     * @return - null or user object passed to sessionactor $init
+     */
     abstract protected Future<Object> isLoginValid(String user, String pwd);
     abstract protected SESSION createSessionActor(String sessionId, Scheduler clientScheduler, Object resultFromIsLoginValid);
 
@@ -181,6 +190,8 @@ public abstract class FourK<SERVER extends Actor,SESSION extends FourKSession> e
             return f;
         });
 
+        DevMode = conf.devmode;
+
         if (!conf.devmode) {
             server.setVirtualfileMapper( (f) -> {
                 // FIXME: implement caching
@@ -231,6 +242,13 @@ public abstract class FourK<SERVER extends Actor,SESSION extends FourKSession> e
             }
         }
         MB2JS.Gen(genBase, "tmp/generated.js");
+    }
+
+    @Override
+    public Future<Monitorable[]> $getSubMonitorables() {
+        Monitorable[] mon = new Monitorable[sessions.size()];
+        sessions.values().toArray(mon);
+        return new Promise<>(mon);
     }
 
 }
