@@ -1,4 +1,4 @@
 4k
 ==========
 
-WebServer for SPA apps based on netty + kontraktor. Also adds websocket actor-remoting to kontraktor
+WebServer for SPA apps based on undertow + kontraktor. Also adds websocket actor-remoting to kontraktor
