@@ -5,7 +5,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>de.ruedigermoeller</groupId>
-    <artifactId>k-undertow</artifactId>
+    <artifactId>4k</artifactId>
     <version>1.0-SNAPSHOT</version>
 
 <build>
@@ -68,6 +68,13 @@
         <groupId>org.apache.httpcomponents</groupId>
         <artifactId>httpclient</artifactId>
         <version>4.4.1</version>
+        <scope>test</scope>
+    </dependency>
+
+    <dependency>
+        <groupId>junit</groupId>
+        <artifactId>junit</artifactId>
+        <version>4.12</version>
         <scope>test</scope>
     </dependency>
 

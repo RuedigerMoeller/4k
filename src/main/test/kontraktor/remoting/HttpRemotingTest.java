@@ -22,9 +22,7 @@ import org.nustaq.kson.KsonStringCharInput;
 import java.io.File;
 import java.io.IOException;
 import java.net.URLEncoder;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
@@ -60,6 +58,7 @@ public class HttpRemotingTest {
     }
 
     static AtomicInteger callCount = new AtomicInteger(0);
+    static AtomicInteger successCount = new AtomicInteger(0);
 
     @Register(Pojo.class)
     public static class HttpTestService extends Actor<HttpTestService> {
@@ -76,12 +75,15 @@ public class HttpRemotingTest {
         //http://localhost:8080/api/test/$hello/1/2/3/4/5/'Guten%20Tag%20!'
         public void $hello( byte b, short s, int i, long l, char c, String str ) {
             System.out.println("byte "+b+", short "+s+", int "+i+", long "+l+", char "+c+", String "+str);
+            successCount.incrementAndGet();
         }
 
         //http://localhost:8080/api/test/$helloBig/1/2/3/4/5/'Guten%20Tag%20!'
         public void $helloBig( Byte b, Short s, Integer i, Long l, Character c, String str ) {
             System.out.println("byte "+b+", short "+s+", int "+i+", long "+l+", char "+c+", String "+str);
+            successCount.incrementAndGet();
         }
+
         //http://localhost:8080/api/test/$callback/
         public void $callback( String dummy, Callback cb ) {
             callCount.incrementAndGet();
@@ -89,6 +91,12 @@ public class HttpRemotingTest {
             delayed( 1000, () -> cb.stream("B") );
             delayed( 1500, () -> cb.stream("C") );
             delayed( 2000, () -> cb.finish() );
+        }
+
+        //FAILS !!
+        public void $hello1( byte b[], short s[], int i[], long l[], char c[], String str[] ) {
+            System.out.println("byte "+b+", short "+s+", int "+i+", long "+l+", char "+c+", String "+str);
+            successCount.incrementAndGet();
         }
 
         public IPromise $promise(String s) {
@@ -99,6 +107,30 @@ public class HttpRemotingTest {
         public IPromise<Pojo> $clonePojo(Pojo pojo) {
             callCount.incrementAndGet();
             return new Promise<>(pojo);
+        }
+
+        public void $testList0( List l, int len ) {
+            if (l.size() == len) {
+                successCount.incrementAndGet();
+            }
+        }
+
+        public void $testList1( ArrayList l, int len ) {
+            if (l.size() == len) {
+                successCount.incrementAndGet();
+            }
+        }
+
+        public void $testMap0( Map<String,String> l, int len ) {
+            if (l.size() == len) {
+                successCount.incrementAndGet();
+            }
+        }
+
+        public void $testMap1( HashMap<String,String> l, int len ) {
+            if (l.size() == len) {
+                successCount.incrementAndGet();
+            }
         }
 
     }
@@ -171,7 +203,7 @@ public class HttpRemotingTest {
 
     @Test
     public void startServer() throws InterruptedException {
-        AtomicInteger successCount = new AtomicInteger(0);
+
         int port = 8080;
         Knode knode = new Knode();
         knode.mainStub(new String[] {"-p",""+port});
@@ -205,6 +237,17 @@ public class HttpRemotingTest {
             System.out.println(r+" - "+e);
             successCount.incrementAndGet();
         });
+
+        clientProxy.$hello((byte)1,(short)22222,222222,1231231231l,(char)44444,"POK");
+        clientProxy.$helloBig((byte) 1, (short) 22222, 222222, 1231231231l, (char) 44444, "POK");
+//        clientProxy.$hello1(new byte[]{1,2,3},new short[]{22222,33},new int[]{222222,234},new long[]{1231231231l,234},"char".toCharArray(),new String[]{"POK","oij"});
+
+        List testList = new ArrayList<>();
+        testList.add(13);
+        testList.add("pok");
+        testList.add(new int[] {1,2,3,4});
+        clientProxy.$testList0(testList, testList.size());
+        clientProxy.$testList1((ArrayList) testList, testList.size());
 
 
         ///////////// VOID message /////////////////////////////////////////////////////////
@@ -364,16 +407,16 @@ public class HttpRemotingTest {
         }
 
         finished.await();
-        Assert.assertTrue(successCount.get() == 10);
+        Assert.assertTrue(successCount.get() == 14);
 
-        callCount.set(0);
-        try {
-            Runtime.getRuntime().exec("firefox "+ new File("./src/main/test/kontraktor/remoting/httptest.html").getCanonicalPath() );
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        Thread.sleep(10000);
-        Assert.assertTrue(callCount.get() == 3);
+//        callCount.set(0);
+//        try {
+//            Runtime.getRuntime().exec("firefox "+ new File("./src/main/test/kontraktor/remoting/httptest.html").getCanonicalPath() );
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
+//        Thread.sleep(10000);
+//        Assert.assertTrue(callCount.get() == 3);
 
         System.out.println("Stopping");
         knode.getServer().stop();
