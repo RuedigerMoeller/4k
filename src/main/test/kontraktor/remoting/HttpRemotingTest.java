@@ -3,23 +3,20 @@ package kontraktor.remoting;
 import junit.framework.Assert;
 import org.apache.http.client.fluent.Content;
 import org.apache.http.client.fluent.Request;
-import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.ContentType;
 import org.junit.Test;
 import org.nustaq.kontraktor.*;
 import org.nustaq.kontraktor.annotations.Register;
 import org.nustaq.kontraktor.remoting.RemoteCallEntry;
 import org.nustaq.kontraktor.remoting.http.*;
-import org.nustaq.kontraktor.undertow.KUndertowHttpServerAdapter;
+import org.nustaq.kontraktor.undertow.http.KUndertowHttpServerAdapter;
 import org.nustaq.kontraktor.undertow.Knode;
 import org.nustaq.kontraktor.util.PromiseLatch;
 import org.nustaq.kontraktor.util.RateMeasure;
 import org.nustaq.kson.Kson;
 import org.nustaq.kson.KsonDeserializer;
-import org.nustaq.kson.KsonSerializer;
 import org.nustaq.kson.KsonStringCharInput;
 
-import java.io.File;
 import java.io.IOException;
 import java.net.URLEncoder;
 import java.util.*;
@@ -204,24 +201,10 @@ public class HttpRemotingTest {
     @Test
     public void startServer() throws InterruptedException {
 
-        int port = 8080;
-        Knode knode = new Knode();
-        knode.mainStub(new String[] {"-p",""+port});
-        KUndertowHttpServerAdapter sAdapt = new KUndertowHttpServerAdapter(
-            knode.getServer(),
-            knode.getPathHandler()
-        );
-
-        HttpObjectSocket.DUMP_REQUESTS = false;
-        RestActorServer restActorServer = new RestActorServer();
-        restActorServer.joinServer("/api", sAdapt);
-
         HttpTestService service = Actors.AsActor(HttpTestService.class);
-        restActorServer.publish("test",service);
+        Knode.PublishHttp("api", "test", service, 8080);
 
-        RestActorClient<HttpTestService> cl = new RestActorClient<>("localhost",8080,"/api/test/",HttpTestService.class);
-        cl.connect();
-        HttpTestService clientProxy = cl.getFacadeProxy();
+        HttpTestService clientProxy = Knode.ConnectHttp(HttpTestService.class,"localhost","/api/test/",8080);
 
         clientProxy.$test("Hello");
 
@@ -419,7 +402,19 @@ public class HttpRemotingTest {
 //        Assert.assertTrue(callCount.get() == 3);
 
         System.out.println("Stopping");
-        knode.getServer().stop();
+        Knode.GetServer(8080).stop();
         Thread.sleep(1000);
+    }
+
+    protected RestActorServer getRestActorServer(Knode knode) {
+        KUndertowHttpServerAdapter sAdapt = new KUndertowHttpServerAdapter(
+            knode.getServer(),
+            knode.getPathHandler()
+        );
+
+        HttpObjectSocket.DUMP_REQUESTS = false;
+        RestActorServer restActorServer = new RestActorServer();
+        restActorServer.joinServer("/api", sAdapt);
+        return restActorServer;
     }
 }

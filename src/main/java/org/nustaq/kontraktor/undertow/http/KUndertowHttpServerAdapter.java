@@ -1,4 +1,4 @@
-package org.nustaq.kontraktor.undertow;
+package org.nustaq.kontraktor.undertow.http;
 
 import io.undertow.Undertow;
 import io.undertow.server.handlers.PathHandler;

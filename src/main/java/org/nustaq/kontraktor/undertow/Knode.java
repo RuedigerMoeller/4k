@@ -13,6 +13,7 @@ import org.nustaq.kontraktor.remoting.Coding;
 import org.nustaq.kontraktor.remoting.SerializerType;
 import org.nustaq.kontraktor.remoting.http.RestActorServer;
 import org.nustaq.kontraktor.remoting.websocket.WebSocketActorServerAdapter;
+import org.nustaq.kontraktor.undertow.http.KUndertowHttpServerAdapter;
 import org.nustaq.kontraktor.undertow.websockets.KUndertowWebSocketHandler;
 import org.nustaq.serialization.FSTConfiguration;
 
@@ -32,6 +33,34 @@ import java.util.function.Consumer;
  *
  */
 public class Knode {
+
+    public static Http4K http4k = new Http4K();
+
+    /**
+     *
+     * publish an actor via a json based API (careful: reduced set of supported actor mechanics. check documentation)
+     * e.g. exposing on "http://localhost:8080/service/myactor/.."
+     *
+     *   MyActor act = Actor.asActor(MyActor.class);
+     *   PublishHttp( "/service", "myactor", act, 8080 );
+     *
+     * @param prefix - general prefix for all services on this port
+     * @param actorName - pathname of actor
+     * @param actor - actor to publish
+     * @param port - port
+     */
+    public static void PublishHttp(String prefix, String actorName, Actor actor, int port) {
+        http4k.publishHttp(prefix,actorName,actor,port);
+    }
+
+    public static <T extends Actor> T ConnectHttp(Class<T> actorClass, String hostName, String path, int port ) {
+        return http4k.connectHttp(actorClass,hostName,path,port);
+    }
+
+    public static Knode GetServer(int port) {
+        return http4k.getExistingServer(8080);
+    }
+
 
     protected Undertow server;
     protected PathHandler pathHandler; // is default handler
@@ -112,15 +141,15 @@ public class Knode {
             raServer.joinServer(prefixPath, sAdapt);
             installedHttpServers.put(prefixPath,raServer);
         }
-        raServer.publish( serviceName, service);
+        raServer.publish(serviceName, service);
     }
 
     protected PathHandler createPathHandler() {
         PathHandler pathHandler = new PathHandler();
         HttpHandler handler = createDefaultHandler();
         pathHandler.addPrefixPath(
-            "/",
-            handler
+                "/",
+                handler
         );
         return pathHandler;
     }
@@ -166,7 +195,7 @@ public class Knode {
         // just used to pass stuff to kontraktor
         public int workerThreads = 2;
         @Parameter( names = {"-iot","-iothreads"}, description = "undertow epoll threads. just used for polling io, not processing")
-        public int ioThreads = 4;
+        public int ioThreads = 2;
 
         public String getHost() {
             return host;
