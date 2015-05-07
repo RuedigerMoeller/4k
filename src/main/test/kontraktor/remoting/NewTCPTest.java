@@ -20,9 +20,13 @@ public class NewTCPTest {
         ServerTestFacade client = TCPActorClient.Connect(ServerTestFacade.class, "localhost", 8080).await();
 //        client.$benchMark1(0, null).then( (r,e) -> System.out.println(r+" e:"+e) );
         Assert.assertTrue(client.$benchMark1(0, null).await(1000000).equals("ok"));
-        System.out.println("done");
-        for ( int i = 0; i < 100_000_000; i++ ) {
+        System.out.println("one way performance");
+        for ( int i = 0; i < 10_000_000; i++ ) {
             client.$benchMark(13,null);
+        }
+        System.out.println("two way performance");
+        for ( int i = 0; i < 10_000_000; i++ ) {
+            client.$benchMark1(13, null);
         }
         Thread.sleep(10000);
     }
