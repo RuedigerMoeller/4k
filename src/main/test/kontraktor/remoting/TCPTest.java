@@ -136,6 +136,8 @@ public class TCPTest {
         Thread.sleep(1000);
     }
 
-    protected ServerTestFacade createClientFac() throws Exception {return TCPActorClient.Connect(ServerTestFacade.class, "localhost", 7777).await();}
+    protected ServerTestFacade createClientFac() throws Exception {
+        return TCPActorClient.Connect(ServerTestFacade.class, "localhost", 7777).await();
+    }
 
 }
