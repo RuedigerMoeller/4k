@@ -1,7 +1,7 @@
 package kontraktor.remoting.helpers;
 
 import org.nustaq.kontraktor.*;
-import org.nustaq.kontraktor.remoting.tcp.TCPActorServerAdapter;
+import org.nustaq.kontraktor.remoting.tcp.TCPActorPublisher;
 import org.nustaq.kontraktor.remoting.websocket.WebSocketActorServerAdapter;
 import org.nustaq.kontraktor.util.RateMeasure;
 
@@ -44,8 +44,13 @@ public class ServerTestFacade extends Actor<ServerTestFacade> {
         return new Promise<>("ok");
     }
 
-    public static TCPActorServerAdapter run() throws Exception {
-        return TCPActorServerAdapter.Publish(Actors.AsActor(ServerTestFacade.class), 7777);
+    public IPromise $benchMark1BigResult(int someVal, String someString) {
+        measure.count();
+        return new Promise<>("pasodkapsodkapsodkapsodkapsodkapsdokapsodkapsodkapsdoaspdokapsdokaspdokaspdokapsdokaspdokaspdokaspdokaspdokaspdoaksdpaoksdpaoskdpasodkapsodkapsodkapsdokapsodkapsdok");
+    }
+
+    public static TCPActorPublisher run() throws Exception {
+        return TCPActorPublisher.Publish(Actors.AsActor(ServerTestFacade.class), 7777);
     }
 
     public static WebSocketActorServerAdapter runWS() throws Exception {

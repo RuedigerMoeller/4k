@@ -12,7 +12,7 @@ import org.nustaq.kontraktor.RemoteConnection;
 import org.nustaq.kontraktor.remoting.RemoteRefRegistry;
 import org.nustaq.kontraktor.remoting.base.ActorServerAdapter;
 import org.nustaq.kontraktor.remoting.tcp.TCPActorClient;
-import org.nustaq.kontraktor.remoting.tcp.TCPActorServerAdapter;
+import org.nustaq.kontraktor.remoting.tcp.TCPActorPublisher;
 import org.nustaq.kontraktor.remoting.websocket.WebSocketClient;
 
 import java.util.function.Function;
@@ -41,7 +41,7 @@ public class MultiRefTest {
     public void multirefTCP() throws Exception {
         Function server = act -> {
             try {
-                return TCPActorServerAdapter.Publish((Actor) act, 7777);
+                return TCPActorPublisher.Publish((Actor) act, 7777);
             } catch (Exception e) {
                 e.printStackTrace();
             }
