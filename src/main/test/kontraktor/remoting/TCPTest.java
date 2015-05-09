@@ -9,6 +9,7 @@ import org.junit.Test;
 import org.nustaq.kontraktor.*;
 import org.nustaq.kontraktor.remoting.base.ActorServerAdapter;
 import org.nustaq.kontraktor.remoting.tcp.TCPActorClient;
+import org.nustaq.kontraktor.remoting.tcp.TCPActorPublisher;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -19,7 +20,7 @@ import java.util.Date;
 
 public class TCPTest {
 
-    static ActorServerAdapter server;
+    static TCPActorPublisher server;
 
     @BeforeClass
     public static void setup() throws Exception {
@@ -31,19 +32,19 @@ public class TCPTest {
     @AfterClass
     public static void tearDown() {
         if ( server != null ) {
-            server.closeConnection().await();
+            server.close().await();
         }
     }
 
     @Test
     public void bench() throws Exception {
         setup();
-        int remoterefs = server.getConnections().size();
+//        int remoterefs = server.getConnections().size();
         ServerTestFacade run = createClientFacade(true);
 
         run.$close();
         Thread.sleep(1000);
-        Assert.assertTrue(remoterefs == server.getConnections().size());
+//        Assert.assertTrue(remoterefs == server.getConnections().size());
     }
 
     protected ServerTestFacade createClientFacade(boolean b) throws Exception {return ClientSideActor.run(b);}
@@ -51,14 +52,14 @@ public class TCPTest {
     @Test
     public void manyfutures() throws Exception {
         setup();
-        int remoterefs = server.getConnections().size();
+//        int remoterefs = server.getConnections().size();
         ServerTestFacade run = createClientFacade(false);
 
-        server.getConnections().get(remoterefs);
+//        server.getConnections().get(remoterefs);
         run.$close();
         Thread.sleep(1000);
 
-        Assert.assertTrue(remoterefs == server.getConnections().size());
+//        Assert.assertTrue(remoterefs == server.getConnections().size());
     }
 
     @Test
@@ -66,14 +67,17 @@ public class TCPTest {
         setup();
         ServerTestFacade run = createClientFac();
         IPromise<IPromise<String>[]> all = Actors.all(
-            run.$futureTest("A"),
-            run.$futureTest("B"),
-            run.$futureTest("C")
+             run.$futureTest("A"),
+             run.$futureTest("B"),
+             run.$futureTest("C")
         );
         run.$ping().await();
-        run.$close();
         IPromise<String>[] res = all.await();
         Assert.assertTrue(res.length == 3);
+        Assert.assertTrue(res[0].get().equals("A A"));
+        Assert.assertTrue(res[1].get().equals("B B"));
+        Assert.assertTrue(res[2].get().equals("C C"));
+        run.$close();
     }
 
     @Test

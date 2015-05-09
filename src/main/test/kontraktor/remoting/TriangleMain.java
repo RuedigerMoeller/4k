@@ -24,7 +24,7 @@ public class TriangleMain {
     @Test
     public void triangle() throws Exception {
         if (TCPTest.server != null) {
-            TCPTest.server.closeConnection();
+            TCPTest.server.close();
             TCPTest.server = null;
         }
         final TCPActorPublisher server = TCPActorPublisher.Publish(Actors.AsActor(CenterActor.class), 7778);
@@ -32,13 +32,13 @@ public class TriangleMain {
         doTest(remoted);
 
 
-        server.closeConnection();
+        server.close();
     }
 
     @Test
     public void triangleWS() throws Exception {
         if (TCPTest.server != null) {
-            TCPTest.server.closeConnection();
+            TCPTest.server.close();
             TCPTest.server = null;
         }
         CenterActor actor = Actors.AsActor(CenterActor.class);
