@@ -1,12 +1,13 @@
 package kontraktor.remoting;
 
+import jdk.nashorn.internal.ir.annotations.Ignore;
 import kontraktor.remoting.helpers.ServerTestFacade;
 import org.junit.Assert;
 import org.junit.Test;
 import org.nustaq.kontraktor.*;
 import org.nustaq.kontraktor.impl.SimpleScheduler;
 import org.nustaq.kontraktor.remoting.tcp.TCPActorClient;
-import org.nustaq.kontraktor.remoting.tcp.NIOActorPublisher;
+import org.nustaq.kontraktor.remoting.tcp.NIOPublisher;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -86,14 +87,14 @@ public class NewTCPTest {
     }
 
     @Test
-    public void test1() throws Exception {
+    public void startServer() throws Exception {
         ServerTestFacade server = Actors.AsActor(ServerTestFacade.class,256000);
-        NIOActorPublisher.Publish(server, 8787).await();
+        NIOPublisher.Publish(server, 8787).await();
         Thread.sleep(10000000);
     }
 
     @Test
-    public void test() throws Exception {
+    public void runClient() throws Exception {
 //        ServerTestFacade server = Actors.AsActor(ServerTestFacade.class,128000);
 //        NIOTCPActorPublisher.Publish(server, 8787).await();
 //        TCPActorServerAdapter.Publish(server, 8787);
@@ -105,6 +106,18 @@ public class NewTCPTest {
         }
 //        NIOTA niota = new NIOTA();
         Thread.sleep(20000000);
+    }
+
+    @Test
+    public void both() throws Exception {
+        new Thread(() -> {
+            try {
+                startServer();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }).start();
+        runClient();
     }
 
 }

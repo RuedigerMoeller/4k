@@ -8,7 +8,7 @@ import org.junit.Test;
 import org.nustaq.kontraktor.Actors;
 import org.nustaq.kontraktor.remoting.base.ActorServerAdapter;
 import org.nustaq.kontraktor.remoting.tcp.TCPActorClient;
-import org.nustaq.kontraktor.remoting.tcp.TCPActorPublisher;
+import org.nustaq.kontraktor.remoting.tcp.TCPPublisher;
 import org.nustaq.kontraktor.remoting.websocket.WebSocketClient;
 
 import java.util.concurrent.atomic.AtomicInteger;
@@ -27,7 +27,7 @@ public class TriangleMain {
             TCPTest.server.close();
             TCPTest.server = null;
         }
-        final TCPActorPublisher server = TCPActorPublisher.Publish(Actors.AsActor(CenterActor.class), 7778);
+        final TCPPublisher server = TCPPublisher.Publish(Actors.AsActor(CenterActor.class), 7778);
         CenterActor remoted = TCPActorClient.Connect(CenterActor.class, "localhost", 7778).await();
         doTest(remoted);
 
