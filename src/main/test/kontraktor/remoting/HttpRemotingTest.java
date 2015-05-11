@@ -8,7 +8,7 @@ import org.junit.Test;
 import org.nustaq.kontraktor.*;
 import org.nustaq.kontraktor.annotations.Register;
 import org.nustaq.kontraktor.remoting.RemoteCallEntry;
-import org.nustaq.kontraktor.remoting.http.*;
+import org.nustaq.kontraktor.remoting.http_old.*;
 import org.nustaq.kontraktor.undertow.http.KUndertowHttpServerAdapter;
 import org.nustaq.kontraktor.undertow.Knode;
 import org.nustaq.kontraktor.util.PromiseLatch;

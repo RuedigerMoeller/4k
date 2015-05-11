@@ -3,10 +3,9 @@ package org.nustaq.kontraktor.undertow.http;
 import io.undertow.Undertow;
 import io.undertow.server.handlers.PathHandler;
 import org.nustaq.kontraktor.Actor;
-import org.nustaq.kontraktor.remoting.http.NioHttpServer;
-import org.nustaq.kontraktor.remoting.http.RestProcessor;
+import org.nustaq.kontraktor.remoting.http_old.NioHttpServer;
+import org.nustaq.kontraktor.remoting.http_old.RestProcessor;
 import org.nustaq.kontraktor.remoting.websocket.WebSocketActorServerAdapter;
-import org.nustaq.kontraktor.undertow.http.KRestProcessorAdapter;
 import org.nustaq.kontraktor.undertow.websockets.KUndertowWebSocketHandler;
 
 /**

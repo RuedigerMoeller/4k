@@ -11,7 +11,7 @@ import io.undertow.server.handlers.resource.ResourceHandler;
 import org.nustaq.kontraktor.Actor;
 import org.nustaq.kontraktor.remoting.Coding;
 import org.nustaq.kontraktor.remoting.SerializerType;
-import org.nustaq.kontraktor.remoting.http.RestActorServer;
+import org.nustaq.kontraktor.remoting.http_old.RestActorServer;
 import org.nustaq.kontraktor.remoting.websocket.WebSocketActorServerAdapter;
 import org.nustaq.kontraktor.undertow.http.KUndertowHttpServerAdapter;
 import org.nustaq.kontraktor.undertow.websockets.KUndertowWebSocketHandler;

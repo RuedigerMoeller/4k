@@ -1,9 +1,9 @@
 package org.nustaq.kontraktor.undertow;
 
 import org.nustaq.kontraktor.Actor;
-import org.nustaq.kontraktor.remoting.http.HttpObjectSocket;
-import org.nustaq.kontraktor.remoting.http.RestActorClient;
-import org.nustaq.kontraktor.remoting.http.RestActorServer;
+import org.nustaq.kontraktor.remoting.http_old.HttpObjectSocket;
+import org.nustaq.kontraktor.remoting.http_old.RestActorClient;
+import org.nustaq.kontraktor.remoting.http_old.RestActorServer;
 import org.nustaq.kontraktor.undertow.http.KUndertowHttpServerAdapter;
 
 import java.util.HashMap;

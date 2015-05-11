@@ -4,7 +4,7 @@ import io.undertow.server.HttpServerExchange;
 import io.undertow.util.HeaderValues;
 import io.undertow.util.Headers;
 import io.undertow.util.Methods;
-import org.nustaq.kontraktor.remoting.http.KontraktorHttpRequest;
+import org.nustaq.kontraktor.remoting.http_old.KontraktorHttpRequest;
 import org.nustaq.kontraktor.remoting.spa.FourK;
 
 import java.nio.ByteBuffer;
