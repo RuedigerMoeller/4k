@@ -158,7 +158,6 @@ public class Knode {
     protected HttpHandler createDefaultHandler() {
         FileResourceManager fileResourceManager = createResourceManager();
         ResourceHandler resourceHandler = new ResourceHandler(fileResourceManager);
-        // undertow already serves static files in a separate thread
         return resourceHandler;
     }
 
