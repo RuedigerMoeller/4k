@@ -9,12 +9,15 @@ var K = new function() {
         this.isPromise = false;
         this.cb = null;
         this.isCompleted = false;
+        this.nextPromise = null;
 
         this.then = function(cb) {
             if ( this.res )
                 cb.apply(null,this.res);
             else
                 this.cb = cb;
+            this.nextPromise = new self.Promise()
+            return this.nextPromise;
         };
         this.complete = function(r,e) {
             if ( this.isCompleted )
